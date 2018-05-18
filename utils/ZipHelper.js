@@ -7,7 +7,7 @@ var archiver = require('archiver');
  */
 const zipFolder = (src, zipPath) => {
   // create a file to stream archive data to.
-  var output = fs.createWriteStream(zipPath + '/akn.zip');
+  var output = fs.createWriteStream(zipPath);
   var archive = archiver('zip', {
     zlib: { level: 9 } // Sets the compression level.
   });
@@ -43,7 +43,7 @@ const zipFolder = (src, zipPath) => {
   archive.pipe(output);
 
   // append files from the src folder
-  archive.glob(src + "/*");
+  archive.glob(src + "/**/*");
 
   // finalize the archive (ie we are done appending files but streams have to finish yet)
   // 'close', 'end' or 'finish' may be fired right after calling this method so register to them beforehand
