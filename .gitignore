@@ -2,3 +2,4 @@ attachments/*
 node_modules/*
 package-lock.json
 akn.zip
+akn/*
