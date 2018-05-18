@@ -12,9 +12,6 @@ const constants = require("./constants");
 const postPkg = (iri) => {
   //Create md5 checksum
   console.log("postPkg", iri, constants.ZIP_FULLPATH());
-
-  //Delete zip and temp folder
-
 }
 
 /**
@@ -31,12 +28,23 @@ const writeXml = (docXml, filename) => {
 
 /**
  * Copy attachments from src to dest.
- * dest (akn/) is a temporary folder for the iri to be published. 
- * This folder will contain the xml and attachments for the iri.
  */
 const copyAtt = (src, dest) => {
   return new Promise(function(resolve, reject) {
     fs.copy(src, dest, function(err) {
+      if (err) reject(err);
+      else resolve(true);
+    })
+  });
+}
+
+/**
+ * Remove file/folder at path.
+ * Removes files in folder recursively (like rm -rf)
+ */
+const removeFileFolder = (path) => {
+  return new Promise(function(resolve, reject) {
+    fs.remove(path, function(err) {
       if (err) reject(err);
       else resolve(true);
     })
@@ -50,32 +58,38 @@ const copyAtt = (src, dest) => {
  * We also create the attachment folder structure inside akn/
  * Create a zip folder, 'akn.zip'
  */
-const prepareZip = (docXml, iri) => {
-  console.log("Get attachments");
+async function prepareZip(docXml, iri) {
   const tmpAknDir = constants.TMP_AKN_FOLDER();
+  const zipPath = constants.ZIP_FULLPATH();
 
-  //Filename for doc XML
-  const xmlFilename = tmpAknDir + "/" + urihelper.fileNameFromIRI(iri, "xml");
+  //Remove any existing zip and temp folder
+  const [res1, res2] = await Promise.all([removeFileFolder(tmpAknDir), removeFileFolder(zipPath)]);
+  if(res1 && res2) {
+    //Filename for doc XML
+    const xmlFilename = tmpAknDir + "/" + urihelper.fileNameFromIRI(iri, "xml");
 
-  //Create the folder structure for attachments
-  let arrIri = iri.split("/");
-  let subPath = arrIri.slice(1, arrIri.length - 1 ).join("/");
-  let attDest = path.join(tmpAknDir, subPath);
-  let attSrc = path.join(constants.AKN_ATT_FOLDER(), subPath);
+    //Create the folder structure for attachments
+    let arrIri = iri.split("/");
+    let subPath = arrIri.slice(1, arrIri.length - 1 ).join("/");
+    let attDest = path.join(tmpAknDir, subPath);
+    let attSrc = path.join(constants.AKN_ATT_FOLDER(), subPath);
 
-  //creates the parent folder 'akn' as well as the attachment folder structure
-  mkdirp(attDest, function(err) {
-    if (err) {
-      logr.error(generalhelper.serverMsg(" ERROR while creating folder "), err);
-    } else {
-      axios.all([writeXml(docXml, xmlFilename), copyAtt(attSrc, attDest)])
-      .then(axios.spread(function (xmlRes, attRes) {
-        zipFolder(tmpAknDir, constants.ZIP_FULLPATH());
-        postPkg(iri);
-      }))
-      .catch(err => console.log(err));
-    }
-  });
+    //creates the parent folder 'akn' as well as the attachment folder structure
+    mkdirp(attDest, function(err) {
+      if (err) {
+        logr.error(generalhelper.serverMsg(" ERROR while creating folder "), err);
+      } else {
+        axios.all([writeXml(docXml, xmlFilename), copyAtt(attSrc, attDest)])
+        .then(axios.spread(function (xmlRes, attRes) {
+          zipFolder(tmpAknDir, zipPath);
+          postPkg(iri);
+        }))
+        .catch(err => console.log(err));
+      }
+    });
+  } else {
+    console.log(res1, res2);
+  }
 }
 
 /**
