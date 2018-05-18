@@ -4,7 +4,7 @@ const API_PORT = process.env.API_PORT || '8080' ;
 
 /** Folders */
 const CONFIG_FOLDER = () => 'configs';
-const AKN_ATT_FOLDER = () => "../gawati-client-server/akn_data_test";
+const AKN_ATT_FOLDER = () => "../gawati-client-server/akn_data";
 const TMP_AKN_FOLDER = () => "./akn";
 const ZIP_FULLPATH = () => process.cwd() + '/akn.zip';
 

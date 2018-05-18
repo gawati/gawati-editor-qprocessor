@@ -1,4 +1,5 @@
 const axios = require("axios");
+const md5File = require('md5-file')
 const logr = require("./logging.js");
 const mq = require("./queues");
 const servicehelper = require("./utils/ServiceHelper");
@@ -11,7 +12,14 @@ const constants = require("./constants");
 
 const postPkg = (iri) => {
   //Create md5 checksum
-  console.log("postPkg", iri, constants.ZIP_FULLPATH());
+  md5File(constants.ZIP_FULLPATH(), (err, hash) => {
+    if (err) throw err
+    console.log(`The MD5 sum of ${constants.ZIP_FULLPATH()} is: ${hash}`)
+    console.log("postPkg", iri, constants.ZIP_FULLPATH());
+    //Post to Portal
+
+    //Publish on STATUS_Q
+  });
 }
 
 /**
@@ -81,8 +89,8 @@ async function prepareZip(docXml, iri) {
       } else {
         axios.all([writeXml(docXml, xmlFilename), copyAtt(attSrc, attDest)])
         .then(axios.spread(function (xmlRes, attRes) {
-          zipFolder(tmpAknDir, zipPath);
-          postPkg(iri);
+          //Pass postPkg as callback on completion of zip. 
+          zipFolder(tmpAknDir, zipPath, () => postPkg(iri));
         }))
         .catch(err => console.log(err));
       }

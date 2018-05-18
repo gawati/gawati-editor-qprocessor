@@ -5,7 +5,7 @@ var archiver = require('archiver');
 /**
  * Creates a zip of the src folder at zipPath 
  */
-const zipFolder = (src, zipPath) => {
+const zipFolder = (src, zipPath, onComplete) => {
   // create a file to stream archive data to.
   var output = fs.createWriteStream(zipPath);
   var archive = archiver('zip', {
@@ -17,6 +17,7 @@ const zipFolder = (src, zipPath) => {
   output.on('close', function() {
     console.log(archive.pointer() + ' total bytes');
     console.log('archiver has been finalized and the output file descriptor has closed.');
+    onComplete();
   });
   
   // This event is fired when the data source is drained no matter what was the data source.
