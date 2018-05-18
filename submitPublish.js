@@ -9,8 +9,12 @@ const path = require("path");
 const mkdirp = require("mkdirp");
 const constants = require("./constants");
 
-const postPkg = () => {
-  console.log("postPkg");
+const postPkg = (iri) => {
+  //Create md5 checksum
+  console.log("postPkg", iri, constants.ZIP_FULLPATH());
+
+  //Delete zip and temp folder
+
 }
 
 /**
@@ -48,7 +52,7 @@ const copyAtt = (src, dest) => {
  */
 const prepareZip = (docXml, iri) => {
   console.log("Get attachments");
-  const tmpAknDir = constants.TMP_AKN();
+  const tmpAknDir = constants.TMP_AKN_FOLDER();
 
   //Filename for doc XML
   const xmlFilename = tmpAknDir + "/" + urihelper.fileNameFromIRI(iri, "xml");
@@ -56,8 +60,8 @@ const prepareZip = (docXml, iri) => {
   //Create the folder structure for attachments
   let arrIri = iri.split("/");
   let subPath = arrIri.slice(1, arrIri.length - 1 ).join("/");
-  let attDest = path.join(constants.TMP_AKN(), subPath);
-  let attSrc = path.join(constants.AKN_ATTACHMENTS(), subPath);
+  let attDest = path.join(tmpAknDir, subPath);
+  let attSrc = path.join(constants.AKN_ATT_FOLDER(), subPath);
 
   //creates the parent folder 'akn' as well as the attachment folder structure
   mkdirp(attDest, function(err) {
@@ -66,9 +70,8 @@ const prepareZip = (docXml, iri) => {
     } else {
       axios.all([writeXml(docXml, xmlFilename), copyAtt(attSrc, attDest)])
       .then(axios.spread(function (xmlRes, attRes) {
-        zipFolder(tmpAknDir, constants.ZIP_PATH());
-        //Post to Portal and get response.
-        //Publish status on STATUS_Q.
+        zipFolder(tmpAknDir, constants.ZIP_FULLPATH());
+        postPkg(iri);
       }))
       .catch(err => console.log(err));
     }

@@ -4,9 +4,9 @@ const API_PORT = process.env.API_PORT || '8080' ;
 
 /** Folders */
 const CONFIG_FOLDER = () => 'configs';
-const AKN_ATTACHMENTS = () => "../gawati-client-server/akn_data_test";
-const TMP_AKN = () => "./akn";
-const ZIP_PATH = () => process.cwd();
+const AKN_ATT_FOLDER = () => "../gawati-client-server/akn_data_test";
+const TMP_AKN_FOLDER = () => "./akn";
+const ZIP_FULLPATH = () => process.cwd() + '/akn.zip';
 
 
 const API_SERVER_BASE = () =>
@@ -33,9 +33,9 @@ const AKN_DOC_TYPES = [
 module.exports = {
     CONFIG_FOLDER: CONFIG_FOLDER,
     API_SERVER_BASE: API_SERVER_BASE,
-    AKN_ATTACHMENTS: AKN_ATTACHMENTS,
-    TMP_AKN: TMP_AKN,
-    ZIP_PATH: ZIP_PATH,
+    AKN_ATT_FOLDER: AKN_ATT_FOLDER,
+    TMP_AKN_FOLDER: TMP_AKN_FOLDER,
+    ZIP_FULLPATH: ZIP_FULLPATH,
     AKN_DOC_TYPES: AKN_DOC_TYPES,
     PROCESS_NAME: PROCESS_NAME
 };
