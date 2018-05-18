@@ -2,7 +2,6 @@ const axios = require("axios");
 const logr = require("./logging.js");
 const mq = require("./queues");
 const servicehelper = require("./utils/ServiceHelper");
-const aknhelper = require("./utils/AknHelper");
 const zipFolder = require("./utils/ZipHelper");
 const urihelper = require("./utils/UriHelper");
 const fs = require("fs-extra");
@@ -12,10 +11,6 @@ const constants = require("./constants");
 
 const postPkg = () => {
   console.log("postPkg");
-}
-
-const createZipPkg = () => {
-  console.log("create zip");
 }
 
 /**
@@ -51,9 +46,8 @@ const copyAtt = (src, dest) => {
  * We also create the attachment folder structure inside akn/
  * Create a zip folder, 'akn.zip'
  */
-const prepareZip = (docXml, aknObj, iri) => {
+const prepareZip = (docXml, iri) => {
   console.log("Get attachments");
-  const attObj = aknhelper.getAttObject(aknObj.akomaNtoso);
   const tmpAknDir = constants.TMP_AKN();
 
   //Filename for doc XML
@@ -65,14 +59,13 @@ const prepareZip = (docXml, aknObj, iri) => {
   let attDest = path.join(constants.TMP_AKN(), subPath);
   let attSrc = path.join(constants.AKN_ATTACHMENTS(), subPath);
 
-  //creates the parent folder 'akn'' as well as the attachment folder structure
+  //creates the parent folder 'akn' as well as the attachment folder structure
   mkdirp(attDest, function(err) {
     if (err) {
       logr.error(generalhelper.serverMsg(" ERROR while creating folder "), err);
     } else {
       axios.all([writeXml(docXml, xmlFilename), copyAtt(attSrc, attDest)])
       .then(axios.spread(function (xmlRes, attRes) {
-        console.log("wrote doc xml and copied att");
         zipFolder(tmpAknDir, constants.ZIP_PATH());
         //Post to Portal and get response.
         //Publish status on STATUS_Q.
@@ -97,33 +90,13 @@ const loadXmlForIri = (iri) => {
   });
 }
 
-/**
- * Get JSON for iri.
- * Returns a promise.
- */
-const loadJsonForIri = (iri) => {
-  console.log(" IN: loadJsonForIri");
-  const loadJsonApi = servicehelper.getApi("xmlServer", "getJson");
-  const {url, method} = loadJsonApi;
-  return axios({
-      method: method,
-      url: url,
-      data: {iri}
-  });
-}
-
 //Get XML, Attachments, Zip and post to Portal
 const toPortal = (iri) => {
   console.log(" IN: toPortal");
-  
-  axios.all([loadXmlForIri(iri), loadJsonForIri(iri)])
-  .then(axios.spread(function (xmlRes, jsonRes) {
-    if (jsonRes.data.error) {
-      console.log(jsonRes.data);
-    } else {
-      prepareZip(xmlRes.data, jsonRes.data, iri);
-    }
-  }))
+  loadXmlForIri(iri)
+  .then(res => {
+    prepareZip(res.data, iri);
+  })
   .catch(err => console.log(err));
 };
 
