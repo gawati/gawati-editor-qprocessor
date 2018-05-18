@@ -1,0 +1,107 @@
+<gwd:package xmlns:gwd="http://gawati.org/ns/1.0/data" iri="/akn/ke/act/legge/1970-06-03/Cap_44/eng@/!main" created="2018-02-24T01:08:30+05:30" modified="2018-02-24T01:08:30+05:30">
+    <gwd:workflow>
+        <gwd:state status="draft" label="Draft"/>
+    </gwd:workflow>
+    <gwd:permissions>
+        <gwd:permission name="view">
+            <gwd:roles>
+                <gwd:role name="client.Admin"/>
+                <gwd:role name="client.Submitter"/>
+            </gwd:roles>
+        </gwd:permission>
+        <gwd:permission name="list">
+            <gwd:roles>
+                <gwd:role name="client.Admin"/>
+                <gwd:role name="client.Submitter"/>
+            </gwd:roles>
+        </gwd:permission>
+        <gwd:permission name="edit">
+            <gwd:roles>
+                <gwd:role name="client.Admin"/>
+                <gwd:role name="client.Submitter"/>
+            </gwd:roles>
+        </gwd:permission>
+        <gwd:permission name="delete">
+            <gwd:roles>
+                <gwd:role name="client.Admin"/>
+                <gwd:role name="client.Submitter"/>
+            </gwd:roles>
+        </gwd:permission>
+        <gwd:permission name="transit">
+            <gwd:roles>
+                <gwd:role name="client.Admin"/>
+                <gwd:role name="client.Submitter"/>
+            </gwd:roles>
+        </gwd:permission>
+    </gwd:permissions>
+<an:akomaNtoso xmlns:an="http://docs.oasis-open.org/legaldocml/ns/akn/3.0">
+    <an:act name="legge">
+        <an:meta>
+            <an:identification source="#gawati">
+                <an:FRBRWork>
+                    <an:FRBRthis value="/akn/ke/act/legge/1970-06-03/Cap_44/!main"/>
+                    <an:FRBRuri value="/akn/ke/act/legge/1970-06-03/Cap_44"/>
+                    <an:FRBRdate name="Work Date" date="1970-06-03"/>
+                    <an:FRBRauthor href="#author"/>
+                    <an:FRBRcountry value="ke" showAs=""/>
+                    <an:FRBRsubtype value="legge"/>
+                    <an:FRBRnumber value="Cap_44" showAs="Cap 44"/>
+                    <an:FRBRprescriptive value="true"/>
+                    <an:FRBRauthoritative value="true"/>
+                </an:FRBRWork>
+                <an:FRBRExpression>
+                    <an:FRBRthis value="/akn/ke/act/legge/1970-06-03/Cap_44/eng@/!main"/>
+                    <an:FRBRuri value="/akn/ke/act/legge/1970-06-03/Cap_44/eng@"/>
+                    <an:FRBRdate name="Expression Date" date="1970-06-03"/>
+                    <an:FRBRauthor href="#author"/>
+                    <an:FRBRlanguage language="eng"/>
+                </an:FRBRExpression>
+                <an:FRBRManifestation>
+                    <an:FRBRthis value="/akn/ke/act/legge/1970-06-03/Cap_44/eng@/!main/!undefined.xml"/>
+                    <an:FRBRuri value="/akn/ke/act/legge/1970-06-03/Cap_44/eng@.akn"/>
+                    <an:FRBRdate name="Manifestation Date" date="1970-06-03"/>
+                    <an:FRBRauthor href="#author"/>
+                    <an:FRBRformat value="xml"/>
+                </an:FRBRManifestation>
+            </an:identification>
+            <an:publication date="1970-06-03" showAs="Indemnity Act" name="legge" number="Cap 44"/>
+            <an:classification source="#gawati">
+            </an:classification>
+            <an:lifecycle source="#all">
+                <an:eventRef date="1970-06-03" source="#original" type="generation"/>
+            </an:lifecycle>
+            <an:references source="#source">
+                <an:original eId="original" href="/akn/ke/act/legge/1970-06-03/Cap_44/eng@/!main" showAs="Cap 44"/>
+                <an:TLCOrganization eId="all" href="/ontology/Organization/AfricanLawLibrary" showAs="African Law Library"/>
+            </an:references>
+            <an:proprietary source="#all">
+                <gw:gawati xmlns:gw="http://gawati.org/ns/1.0">
+                    <gw:docPart>main</gw:docPart>
+                    <gw:languages>
+                        <gw:language code="eng" showAs="English"/>
+                    </gw:languages>
+                    <gw:embeddedContents>
+                            <an:embeddedContent eId="embedded-doc-1" type="embedded" fileType=".png" file="akn_ke_act_legge_1970-06-03_Cap_44_eng_main_1.png" origFileName="2015-10-28 09_57_44-Greenshot.png" state="true"/>
+                            <an:embeddedContent eId="embedded-doc-2" type="embedded" fileType=".doc" file="akn_ke_act_legge_1970-06-03_Cap_44_eng_main_2.doc" origFileName="8SRFPv2.doc" state="true"/>
+                            <an:embeddedContent eId="embedded-doc-3" type="embedded" fileType=".jpg" file="akn_ke_act_legge_1970-06-03_Cap_44_eng_main_3.jpg" origFileName="hiroshige.jpg" state="true"/>
+                        </gw:embeddedContents>
+                    <gw:dateTime refersTo="#docCreatedDate" datetime="2018-04-30T10:06:23.385+05:30"/>
+                    <gw:dateTime refersTo="#docModifiedDate" datetime="2018-05-14T13:43:44.061+05:30"/>
+                    <gw:date refersTo="#docVersionDate" date="1970-06-03"/>
+                    <gw:date refersTo="#docPublicationDate" date="2018-02-24"/>
+                    <gw:date refersTo="#docEntryIntoForceDate" date="2018-02-24"/>
+                    <gw:themes source="#legacy">
+                    </gw:themes>
+                </gw:gawati>
+            </an:proprietary>
+        </an:meta>
+        <an:body>
+            <an:book refersTo="#mainDocument">
+                    <an:componentRef src="/akn/ke/act/legge/1970-06-03/Cap_44/eng@/!main_1" alt="2015-10-28 09_57_44-Greenshot.png" GUID="#embedded-doc-1" showAs="AIF PROJECT"/>
+                    <an:componentRef src="/akn/ke/act/legge/1970-06-03/Cap_44/eng@/!main_2" alt="8SRFPv2.doc" GUID="#embedded-doc-2" showAs="DC"/>
+                    <an:componentRef src="/akn/ke/act/legge/1970-06-03/Cap_44/eng@/!main_3" alt="hiroshige.jpg" GUID="#embedded-doc-3" showAs="Hiro"/>
+                </an:book>
+        </an:body>
+    </an:act>
+</an:akomaNtoso>
+</gwd:package>
