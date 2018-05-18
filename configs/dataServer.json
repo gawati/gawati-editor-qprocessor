@@ -1,0 +1,32 @@
+{
+    "xmlServer" : {
+        "serviceEndPoint" : "http://localhost:8080/exist/restxq",
+        "api": {
+            "saveXml": { 
+                "url": "/gwdc/document/add",
+                "method": "post"
+            },
+            "getJson" : {
+                "url": "/gwdc/document/load",
+                "method": "post"
+            },
+            "getXml" : {
+                "url": "/gwdc/document/load/xml",
+                "method": "post"
+            },
+            "updateXml" : {
+                "url": "/gwdc/document/edit",
+                "method": "post"
+            }
+        }
+    },
+    "portalData": {
+        "serviceEndPoint" : "http://localhost:8080/exist/restxq",
+        "api": {
+            "docExists": {
+                "url": "/gw/doc/exists",
+                "method": "post"
+            }
+        }
+    }
+}
