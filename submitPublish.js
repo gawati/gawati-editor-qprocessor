@@ -1,7 +1,6 @@
 const axios = require("axios");
 const md5File = require('md5-file')
 const logr = require("./logging.js");
-const mq = require("./queues");
 const servicehelper = require("./utils/ServiceHelper");
 const zipFolder = require("./utils/ZipHelper");
 const urihelper = require("./utils/UriHelper");
@@ -10,15 +9,33 @@ const path = require("path");
 const mkdirp = require("mkdirp");
 const constants = require("./constants");
 
+//Publish on STATUS_Q
+const publishStatus = (iri) => {
+  const msg = {
+    "iri": iri,
+    "status": "Processing"
+  }
+
+  const mq = require("./queues");
+  const qName = 'STATUS_Q';
+  const ex = mq.getExchange();
+  const key = mq.getQKey(qName);
+  mq.getChannel(qName).publish(ex, key, new Buffer(JSON.stringify(msg)));
+  console.log(" Status dispatched to Editor-FE");
+}
+
 const postPkg = (iri) => {
+  console.log(" IN: postPkg");
   //Create md5 checksum
   md5File(constants.ZIP_FULLPATH(), (err, hash) => {
     if (err) throw err
-    console.log(`The MD5 sum of ${constants.ZIP_FULLPATH()} is: ${hash}`)
-    console.log("postPkg", iri, constants.ZIP_FULLPATH());
-    //Post to Portal
+    console.log(` The MD5 sum of ${constants.ZIP_FULLPATH()} is: ${hash}`);
 
-    //Publish on STATUS_Q
+    //Post to Portal
+    console.log(" postPkg", iri, constants.ZIP_FULLPATH());
+
+    //Publish on STATUS_Q after receiveing portal reponse.
+    publishStatus(iri);
   });
 }
 
@@ -67,6 +84,7 @@ const removeFileFolder = (path) => {
  * Create a zip folder, 'akn.zip'
  */
 async function prepareZip(docXml, iri) {
+  console.log(" IN: prepareZip");
   const tmpAknDir = constants.TMP_AKN_FOLDER();
   const zipPath = constants.ZIP_FULLPATH();
 
