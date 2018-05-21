@@ -43,7 +43,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // INDEX_DEL
 //app.use("/", index);
 
-app.use("/gwc", routes);
+app.use("/gwcq", routes);
 
 
 // catch 404 and forward to error handler

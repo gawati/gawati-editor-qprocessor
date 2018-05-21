@@ -2,7 +2,7 @@ const express = require("express");
 var bodyParser = require("body-parser");
 var multer = require("multer");
 const packageJSON = require("./package.json");
-const publishapis = require ("./publish.routes");
+const smapis = require ("./statusMonitor.routes");
 
 var upload = multer();
 
@@ -10,32 +10,32 @@ var router = express.Router();
 
 var jsonParser = bodyParser.json();
 
-/** adding document publish apis */
-Object.keys(publishapis.publishAPIs).forEach(
+/** adding Publish Status Monitor apis */
+Object.keys(smapis.smAPIs).forEach(
     (routePath) => {
-        const publishRoute = publishapis.publishAPIs[routePath];
-        console.log(` ROUTE PATH = ${routePath} with ${publishRoute.method}`);
-        switch(publishRoute.method) {
+        const smRoute = smapis.smAPIs[routePath];
+        console.log(` ROUTE PATH = ${routePath} with ${smRoute.method}`);
+        switch(smRoute.method) {
         case "get":
             router.get(
                 routePath,
                 jsonParser,
-                publishRoute.stack
+                smRoute.stack
             );
             break;
         case "post":
             router.post(
                 routePath,
                 jsonParser,
-                publishRoute.stack
+                smRoute.stack
             );
             break;
         default:
-            logr.error(`Unknown method provide ${publishRoute.method} only "get" and "post" are supported` );
+            logr.error(`Unknown method provide ${smRoute.method} only "get" and "post" are supported` );
             break;
         }
     }
-);  
+);
 
 module.exports = router;
 

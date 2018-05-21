@@ -26,33 +26,6 @@ const returnResponse = (req, res) => {
 };
 
 /**
- * Loads the XML document from the db given a specific IRI
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- */
-const loadXmlForIri = (req, res, next) => {
-    console.log(" IN: loadXmlForIri");
-    const loadXmlApi = servicehelper.getApi("xmlServer", "getXml");
-    const {url, method} = loadXmlApi;    
-    axios({
-        method: method,
-        url: url,
-        data: res.locals.formObject
-    }).then(
-        (response) => {
-            res.locals.aknObject = response.data;
-            next();
-        }
-    ).catch(
-        (err) => {
-            res.locals.aknObject = err;
-            next();
-        }
-    );
-};
-
-/**
  * Publishes the status for document iri on the STATUS_Q
  * @param {*} req
  * @param {*} res
@@ -60,20 +33,27 @@ const loadXmlForIri = (req, res, next) => {
  */
 const publishOnStatusQ = (req, res, next) => {
     console.log(" IN: publishOnStatusQ");
+    console.log(res.locals.formObject);
     const {iri, status} = res.locals.formObject;
 
-    //Publish on STATUS_Q
-    // qName = 'STATUS_Q';
-    // const ex = mq.getExchange();
-    // const key = mq.getQKey(qName);
-    // mq.getChannel(qName).publish(ex, key, new Buffer(iri));
+    const msg = {
+        "iri": iri,
+        "status": status
+    }
 
-    // res.locals.returnResponse = {
-    //     'success': {
-    //         'code': 'publish_document',
-    //         'message': res.locals.formObject
-    //     }
-    // }
+    const mq = require("./queues");
+    const qName = 'STATUS_Q';
+    const ex = mq.getExchange();
+    const key = mq.getQKey(qName);
+    mq.getChannel(qName).publish(ex, key, new Buffer(JSON.stringify(msg)));
+    console.log(" Status dispatched to Editor-FE");
+
+    res.locals.returnResponse = {
+        'success': {
+            'code': 'publish_status',
+            'message': res.locals.formObject
+        }
+    }
     next();
 };
 
@@ -85,11 +65,7 @@ const publishOnStatusQ = (req, res, next) => {
  * without proceeding to the next method in the API stack. 
  */
 module.exports = {
-    //Common methods
     receiveSubmitData: receiveSubmitData,
-    returnResponse: returnResponse,
-
-    //Publish methods
-    loadXmlForIri: loadXmlForIri,
-    publishOnStatusQ: publishOnStatusQ
+    publishOnStatusQ: publishOnStatusQ,
+    returnResponse: returnResponse
 };
