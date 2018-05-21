@@ -13,7 +13,7 @@ const constants = require("./constants");
 const publishStatus = (iri) => {
   const msg = {
     "iri": iri,
-    "status": "Processing"
+    "status": "under_processing"
   }
 
   const mq = require("./queues");
