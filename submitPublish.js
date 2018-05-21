@@ -56,10 +56,14 @@ const writeXml = (docXml, filename) => {
  */
 const copyAtt = (src, dest) => {
   return new Promise(function(resolve, reject) {
-    fs.copy(src, dest, function(err) {
-      if (err) reject(err);
-      else resolve(true);
-    })
+    if (fs.existsSync(src)) {
+      fs.copy(src, dest, function(err) {
+        if (err) reject(err);
+        else resolve(true);
+      })
+    } else {
+      resolve(true);
+    }
   });
 }
 
