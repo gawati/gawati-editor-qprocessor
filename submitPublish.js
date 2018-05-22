@@ -41,9 +41,9 @@ const postPkg = (iri, zipPath) => {
 }
 
 /**
- * Writes a given xml string to file.
+ * Writes a given string to file.
  */
-const writeXml = (docXml, filename) => {
+const writeFile = (docXml, filename) => {
   return new Promise(function(resolve, reject) {
     fs.writeFile(filename, docXml, function(err) {
       if (err) reject(err);
@@ -81,6 +81,9 @@ const removeFileFolder = (path) => {
   });
 }
 
+/**
+ * Generates a uid of length 5
+ */
 const getUid = () => {
   return Math.random().toString(36).substr(2, 5);
 }
@@ -92,7 +95,7 @@ const writeManifest = (tmpAknDir) => {
   const manifestPath = path.join(tmpAknDir, "manifest.txt");
   const files = glob.sync("**/*.*", {cwd: tmpAknDir});
   const content = files.join("\n");
-  return writeXml(content, manifestPath);
+  return writeFile(content, manifestPath);
 }
 
 /**
@@ -125,7 +128,7 @@ async function prepareZip(docXml, iri) {
       if (err) {
         logr.error(generalhelper.serverMsg(" ERROR while creating folder "), err);
       } else {
-        axios.all([writeXml(docXml, xmlFilename), copyAtt(attSrc, attDest)])
+        axios.all([writeFile(docXml, xmlFilename), copyAtt(attSrc, attDest)])
         .then(res => writeManifest(tmpAknDir))
         //Pass postPkg as callback on completion of zip.
         .then(res => zipFolder(tmpUid, zipPath, () => postPkg(iri, zipPath)))
