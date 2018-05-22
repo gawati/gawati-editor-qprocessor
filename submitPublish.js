@@ -7,6 +7,7 @@ const urihelper = require("./utils/UriHelper");
 const fs = require("fs-extra");
 const path = require("path");
 const mkdirp = require("mkdirp");
+const glob = require("glob");
 const constants = require("./constants");
 
 //Publish on STATUS_Q
@@ -85,6 +86,16 @@ const getUid = () => {
 }
 
 /**
+ * Write a manifest file listing the contents of the zip folder
+ */
+const writeManifest = (tmpAknDir) => {
+  const manifestPath = path.join(tmpAknDir, "manifest.txt");
+  const files = glob.sync("**/*.*", {cwd: tmpAknDir});
+  const content = files.join("\n");
+  return writeXml(content, manifestPath);
+}
+
+/**
  * Create a temporary folder 'akn/' to hold
  * a. Doc XML
  * b. Attachments
@@ -115,10 +126,9 @@ async function prepareZip(docXml, iri) {
         logr.error(generalhelper.serverMsg(" ERROR while creating folder "), err);
       } else {
         axios.all([writeXml(docXml, xmlFilename), copyAtt(attSrc, attDest)])
-        .then(axios.spread(function (xmlRes, attRes) {
-          //Pass postPkg as callback on completion of zip. 
-          zipFolder(tmpUid, zipPath, () => postPkg(iri, zipPath));
-        }))
+        .then(res => writeManifest(tmpAknDir))
+        //Pass postPkg as callback on completion of zip.
+        .then(res => zipFolder(tmpUid, zipPath, () => postPkg(iri, zipPath)))
         .catch(err => console.log(err));
       }
     });
