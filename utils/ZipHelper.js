@@ -1,6 +1,8 @@
 // require modules
 var fs = require('fs');
 var archiver = require('archiver');
+const path = require('path');
+const constants = require("../constants");
 
 /**
  * Creates a zip of the src folder at zipPath 
@@ -44,7 +46,7 @@ const zipFolder = (src, zipPath, onComplete) => {
   archive.pipe(output);
 
   // append files from the src folder
-  archive.glob(src + "/**/*");
+  archive.glob(src + "/**/*", {cwd: constants.TMP_AKN_FOLDER()});
 
   // finalize the archive (ie we are done appending files but streams have to finish yet)
   // 'close', 'end' or 'finish' may be fired right after calling this method so register to them beforehand
