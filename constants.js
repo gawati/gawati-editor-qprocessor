@@ -1,12 +1,13 @@
+const path = require("path");
 const API_PROTOCOL = process.env.API_PROTOCOL || 'http' ;
 const API_HOST = process.env.API_HOST || 'localhost' ;
 const API_PORT = process.env.API_PORT || '8080' ;
 
 /** Folders */
 const CONFIG_FOLDER = () => 'configs';
-const AKN_ATT_FOLDER = () => "../gawati-client-server/akn_data";
-const TMP_AKN_FOLDER = () => "./akn";
-const ZIP_FULLPATH = () => process.cwd() + '/akn.zip';
+const AKN_ATT_FOLDER = () => path.join("..", "gawati-client-server", "akn_data");
+const TMP_AKN_FOLDER = () => path.join(".", "akn");
+const ZIP_FULLPATH = () => path.join(process.cwd(), 'akn.zip');
 
 
 const API_SERVER_BASE = () =>
