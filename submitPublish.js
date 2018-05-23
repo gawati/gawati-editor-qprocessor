@@ -26,34 +26,48 @@ const publishStatus = (iri) => {
   console.log(" Status dispatched to Editor-FE");
 }
 
+/**
+ * Computes the MD5 checksum of a file
+ */
+const computeMD5 = (filepath) => {
+  return new Promise(function(resolve, reject) {
+    md5File(filepath, (err, hash) => {
+      if (err) reject(err);
+      else resolve(hash)
+    });
+  });
+}
+
+/**
+ * Posts zip pkg to portal.
+ */
+const postToPortal = (iri, zipPath, checksum) => {
+  console.log(" IN: postToPortal");
+  const pubPkgApi = servicehelper.getApi("portalQProc", "pubPkg");
+  const {url, method} = pubPkgApi;
+
+  let data = new FormData();
+  data.append('iri', iri);
+  data.append('checksum', checksum);
+  data.append('zipFile', fs.createReadStream(zipPath));
+
+  return axios({
+    method: method,
+    url: url,
+    data: data,
+    headers: data.getHeaders()
+  });
+}
+
+/**
+ * Post Package and publish status
+ */
 const postPkg = (iri, zipPath) => {
   console.log(" IN: postPkg");
-  //Create md5 checksum
-  md5File(zipPath, (err, hash) => {
-    if (err) throw err
-    console.log(` The MD5 sum of ${zipPath} is: ${hash}`);
-
-    //Post to Portal
-    console.log(" postPkg", zipPath);
-    const pubPkgApi = servicehelper.getApi("portalQProc", "pubPkg");
-    const {url, method} = pubPkgApi;
-
-    let data = new FormData();
-    data.append('checksum', hash);
-    data.append('zipFile', fs.createReadStream(zipPath));
-
-    axios({
-      method: method,
-      url: url,
-      data: data,
-      headers: data.getHeaders()
-    })
-    .then(res => console.log(res.data))
-    .catch(err => console.log(err));
-
-    //Publish on STATUS_Q after receiveing portal reponse.
-    // publishStatus(iri);
-  });
+  computeMD5(zipPath)
+  .then(res => postToPortal(iri, zipPath, res))
+  .then(res => publishStatus(iri))
+  .catch(err => console.log(err));
 }
 
 /**
