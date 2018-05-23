@@ -13,6 +13,7 @@ const constants = require("./constants");
 
 //Publish on STATUS_Q
 const publishStatus = (iri) => {
+  console.log(" IN: publishStatus");
   const msg = {
     "iri": iri,
     "status": "under_processing"
@@ -66,7 +67,11 @@ const postPkg = (iri, zipPath) => {
   console.log(" IN: postPkg");
   computeMD5(zipPath)
   .then(res => postToPortal(iri, zipPath, res))
-  .then(res => publishStatus(iri))
+  .then((res) => {
+    res.data.success
+    ? publishStatus(iri)
+    : console.log(res.data.error);
+  })
   .catch(err => console.log(err));
 }
 
