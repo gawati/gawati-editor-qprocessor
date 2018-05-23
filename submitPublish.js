@@ -1,5 +1,6 @@
 const axios = require("axios");
-const md5File = require('md5-file')
+const FormData = require('form-data');
+const md5File = require('md5-file');
 const logr = require("./logging.js");
 const servicehelper = require("./utils/ServiceHelper");
 const zipFolder = require("./utils/ZipHelper");
@@ -33,7 +34,22 @@ const postPkg = (iri, zipPath) => {
     console.log(` The MD5 sum of ${zipPath} is: ${hash}`);
 
     //Post to Portal
-    console.log(" postPkg", iri, zipPath);
+    console.log(" postPkg", zipPath);
+    const pubPkgApi = servicehelper.getApi("portalQProc", "pubPkg");
+    const {url, method} = pubPkgApi;
+
+    let data = new FormData();
+    data.append('checksum', hash);
+    data.append('zipFile', fs.createReadStream(zipPath));
+
+    axios({
+      method: method,
+      url: url,
+      data: data,
+      headers: data.getHeaders()
+    })
+    .then(res => console.log(res.data))
+    .catch(err => console.log(err));
 
     //Publish on STATUS_Q after receiveing portal reponse.
     // publishStatus(iri);
