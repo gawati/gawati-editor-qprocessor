@@ -71,11 +71,11 @@ const postPkg = (iri, zipPath) => {
 }
 
 /**
- * Writes a given string to file.
+ * Writes a given string/buffer to file.
  */
-const writeFile = (docXml, filename) => {
+const writeFile = (data, filename) => {
   return new Promise(function(resolve, reject) {
-    fs.writeFile(filename, docXml, function(err) {
+    fs.writeFile(filename, data, function(err) {
       if (err) reject(err);
       else resolve(true);
     });
