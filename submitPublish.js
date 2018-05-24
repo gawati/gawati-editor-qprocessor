@@ -5,27 +5,12 @@ const logr = require("./logging.js");
 const servicehelper = require("./utils/ServiceHelper");
 const zipFolder = require("./utils/ZipHelper");
 const urihelper = require("./utils/UriHelper");
+const qh = require("./utils/QueueHelper");
 const fs = require("fs-extra");
 const path = require("path");
 const mkdirp = require("mkdirp");
 const glob = require("glob");
 const constants = require("./constants");
-
-//Publish on STATUS_Q
-const publishStatus = (iri) => {
-  console.log(" IN: publishStatus");
-  const msg = {
-    "iri": iri,
-    "status": "under_processing"
-  }
-
-  const mq = require("./queues");
-  const qName = 'STATUS_Q';
-  const ex = mq.getExchange();
-  const key = mq.getQKey(qName);
-  mq.getChannel(qName).publish(ex, key, new Buffer(JSON.stringify(msg)));
-  console.log(" Status dispatched to Editor-FE");
-}
 
 /**
  * Computes the MD5 checksum of a file
@@ -68,11 +53,14 @@ const postPkg = (iri, zipPath) => {
   computeMD5(zipPath)
   .then(res => postToPortal(iri, zipPath, res))
   .then((res) => {
-    res.data.success
-    ? publishStatus(iri)
-    : console.log(res.data.error);
+    (res.data.success)
+    ? qh.publishStatus(qh.formMsg(iri, 'under_processing', res.data.success.message))
+    : qh.publishStatus(qh.formMsg(iri, 'failed', res.data.error.message))
   })
-  .catch(err => console.log(err));
+  .catch((err) => {
+    qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Portal Q Processor'))
+    console.log(err)
+  });
 }
 
 /**
@@ -167,7 +155,10 @@ async function prepareZip(docXml, iri) {
         .then(res => writeManifest(tmpAknDir))
         //Pass postPkg as callback on completion of zip.
         .then(res => zipFolder(tmpUid, zipPath, () => postPkg(iri, zipPath)))
-        .catch(err => console.log(err));
+        .catch((err) => {
+          qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor'));
+          console.log(err);
+        });
       }
     });
   })
@@ -196,7 +187,10 @@ const toPortal = (iri) => {
   .then(res => {
     prepareZip(res.data, iri);
   })
-  .catch(err => console.log(err));
+  .catch((err) => {
+    qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor'));
+    console.log(err);
+  });
 };
 
 module.exports.toPortal = toPortal;

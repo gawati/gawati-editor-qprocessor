@@ -1,5 +1,6 @@
 const axios = require("axios");
 const mq = require("./queues");
+const qh = require("./utils/QueueHelper");
 
 /**
  * Receives the Form posting, not suitable for multipart form data
@@ -33,20 +34,8 @@ const returnResponse = (req, res) => {
  */
 const publishOnStatusQ = (req, res, next) => {
     console.log(" IN: publishOnStatusQ");
-    console.log(res.locals.formObject);
-    const {iri, status} = res.locals.formObject;
-
-    const msg = {
-        "iri": iri,
-        "status": status
-    }
-
-    const mq = require("./queues");
-    const qName = 'STATUS_Q';
-    const ex = mq.getExchange();
-    const key = mq.getQKey(qName);
-    mq.getChannel(qName).publish(ex, key, new Buffer(JSON.stringify(msg)));
-    console.log(" Status dispatched to Editor-FE");
+    const {iri, status, message} = res.locals.formObject;
+    qh.publishStatus(qh.formMsg(iri, status, message));
 
     res.locals.returnResponse = {
         'success': {
