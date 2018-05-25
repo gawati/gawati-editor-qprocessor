@@ -8,7 +8,7 @@
 ### Setup
 1. Clone the repo
     ```
-    git clone git@gitlab.com:bungenicom/gawati/gawati-editor-fe.git
+    git clone git@gitlab.com:bungenicom/gawati/gawati-editor-qprocessor.git
     ```
 2. Install packages
     ```
