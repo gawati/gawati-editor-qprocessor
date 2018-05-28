@@ -19,7 +19,7 @@ const publishStatus = (msg) => {
   const qName = 'STATUS_Q';
   const ex = mq.getExchange();
   const key = mq.getQKey(qName);
-  mq.getChannel(qName).publish(ex, key, new Buffer(JSON.stringify(msg)));
+  mq.getChannel(qName).publish(ex, key, new Buffer(JSON.stringify(msg)), {persistent: true});
   console.log(" Status dispatched to Editor-FE");
 }
 

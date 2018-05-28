@@ -68,7 +68,7 @@ function consumerIriQ(conn) {
   function onOpen(err, channel) {
     if (err != null) bail(err);
     channel.assertExchange(ex, 'direct', {durable: true});
-    channel.assertQueue('', {exclusive: true}, function(err, q) {
+    channel.assertQueue('editor_iri_q', {exclusive: false, durable: true}, function(err, q) {
       console.log(" %s consumer channel opened.", qName);
       console.log(' [*] Waiting for messages. To exit press CTRL+C');
       channel.bindQueue(q.queue, ex, key);
