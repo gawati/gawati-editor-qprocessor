@@ -31,4 +31,7 @@
 2. Document attachments path: This is set in `constants.js` and refers to the filesystem path where attachments are stored for all Editor documents.
 3. Service end points: Endpoints for talking to gawati-editor-fe and gawati-portal-qprocessor. Set in `configs/dataServer.json`
 
-##### The full documentation of the *Publishing Workflow* is [here]
+##### Workflow
+
+ * [Workflow Documentation](PUBLISH_WORKFLOW.md)
+ * [Workflow Tests](PUBLISH_WORKFLOW_TESTS.md)
