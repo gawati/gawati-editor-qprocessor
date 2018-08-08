@@ -11,6 +11,19 @@ const path = require("path");
 const mkdirp = require("mkdirp");
 const glob = require("glob");
 const constants = require("./constants");
+const extract = require("extract-zip");
+
+/**
+ * Extract a zip folder
+ */
+const unzip = (src, dest) => {
+  return new Promise(function(resolve, reject) {
+    extract(src, {dir: dest}, function(err) {
+      if (err) reject(err);
+      else resolve(true);
+    })
+  });
+}
 
 /**
  * Computes the MD5 checksum of a file
@@ -76,9 +89,9 @@ const writeFile = (data, filename) => {
 }
 
 /**
- * Copy attachments from src to dest.
+ * Copy files from src to dest.
  */
-const copyAtt = (src, dest) => {
+const copyFiles = (src, dest) => {
   return new Promise(function(resolve, reject) {
     if (fs.existsSync(src)) {
       fs.copy(src, dest, function(err) {
@@ -122,13 +135,42 @@ const writeManifest = (tmpAknDir) => {
 }
 
 /**
+ * Extracts the IRI package recieved in the response data from editor-fe. 
+ * This contains the Metadata XML and Public key (if present)
+ */
+const extractPkg = (data, tmpAknDir) => {
+  return new Promise(function(resolve, reject) {
+    const zipPath = tmpAknDir + '.zip';
+    data.pipe(fs.createWriteStream(zipPath));
+    data.on('end', () => {
+      console.log("RECEIVED PKG");
+      unzip(zipPath, path.resolve(tmpAknDir))
+      .then(res => {
+        console.log("UNZIPPED", tmpAknDir);
+        resolve(true);
+      })
+      .catch(err => {
+        reject(err);
+        console.log("ERROR");
+      });
+    });
+    data.on('error', () => {
+        const msg = {"status": "error", "msg": "Error while unzipping the IRI package"};
+        console.log(msg);
+        reject(msg);
+    });
+  });
+}
+
+/**
  * Create a temporary folder 'akn/' to hold
  * a. Doc XML
  * b. Attachments
+ * c. Public key (if present)
  * We also create the attachment folder structure inside akn/
  * Create a zip folder, 'akn.zip'
  */
-async function prepareZip(docXml, iri) {
+async function prepareZip(data, iri) {
   console.log(" IN: prepareZip");
   const tmpUid = 'tmp' + getUid();
   const tmpAknDir = path.join(constants.TMP_AKN_FOLDER(), tmpUid);
@@ -136,10 +178,10 @@ async function prepareZip(docXml, iri) {
 
   //Remove existing folders with the same tmpUid
   removeFileFolder(tmpAknDir)
+  .then(res => {
+    return extractPkg(data, tmpAknDir);
+  })
   .then((res) => {
-    //Filename for doc XML
-    const xmlFilename = path.join(tmpAknDir, urihelper.fileNameFromIRI(iri, "xml"));
-
     //Create the folder structure for attachments
     let arrIri = iri.split("/");
     let subPath = arrIri.slice(1, arrIri.length - 1 ).join("/");
@@ -151,7 +193,7 @@ async function prepareZip(docXml, iri) {
       if (err) {
         logr.error(generalhelper.serverMsg(" ERROR while creating folder "), err);
       } else {
-        axios.all([writeFile(docXml, xmlFilename), copyAtt(attSrc, attDest)])
+        copyFiles(attSrc, attDest)
         .then(res => writeManifest(tmpAknDir))
         //Pass postPkg as callback on completion of zip.
         .then(res => zipFolder(tmpUid, zipPath, () => postPkg(iri, zipPath)))
@@ -180,12 +222,30 @@ const loadXmlForIri = (iri) => {
   });
 }
 
-//Get XML, Attachments, Zip and post to Portal
+const loadPkgForIri = (iri) => {
+  console.log(" IN: loadXmlForIri");
+  const loadPkgApi = servicehelper.getApi("editor-fe", "loadPkg");
+  const {url, method} = loadPkgApi;
+  return axios({
+    method: method,
+    url: url,
+    data: {"data": {"iri": iri, "noAtt": true}},
+    responseType: 'stream'
+  });
+}
+
+//Get XML, Public key (if present), Attachments, Zip and post to Portal
 const toPortal = (iri) => {
   console.log(" IN: toPortal");
-  loadXmlForIri(iri)
-  .then(res => {
-    prepareZip(res.data, iri);
+  loadPkgForIri(iri)
+  .then(response => {
+    const contentType = response.headers['content-type'];
+    if (contentType.indexOf('application/json') !== -1) {
+        qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor'));
+        console.log("Error while loading the IRI package");
+    } else {
+      prepareZip(response.data, iri);
+    }
   })
   .catch((err) => {
     qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor'));

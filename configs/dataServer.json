@@ -20,6 +20,17 @@
             }
         }
     },
+
+    "editor-fe" : {
+        "serviceEndPoint" : "http://localhost",
+        "api": {
+            "loadPkg": { 
+                "url": "/gwc/pkg/load",
+                "method": "post"
+            }
+        }
+    },
+
     "portalQProc": {
         "serviceEndPoint" : "http://localhost:9004",
         "api": {
