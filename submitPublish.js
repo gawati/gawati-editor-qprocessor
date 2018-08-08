@@ -143,15 +143,12 @@ const extractPkg = (data, tmpAknDir) => {
     const zipPath = tmpAknDir + '.zip';
     data.pipe(fs.createWriteStream(zipPath));
     data.on('end', () => {
-      console.log("RECEIVED PKG");
       unzip(zipPath, path.resolve(tmpAknDir))
       .then(res => {
-        console.log("UNZIPPED", tmpAknDir);
         resolve(true);
       })
       .catch(err => {
         reject(err);
-        console.log("ERROR");
       });
     });
     data.on('error', () => {
@@ -207,23 +204,8 @@ async function prepareZip(data, iri) {
   .catch(err => console.log(err));
 }
 
-/**
- * Get XML for iri.
- * Returns a promise.
- */
-const loadXmlForIri = (iri) => {
-  console.log(" IN: loadXmlForIri");
-  const loadXmlApi = servicehelper.getApi("xmlServer", "getXml");
-  const {url, method} = loadXmlApi;
-  return axios({
-    method: method,
-    url: url,
-    data: {iri}
-  });
-}
-
 const loadPkgForIri = (iri) => {
-  console.log(" IN: loadXmlForIri");
+  console.log(" IN: loadPkgForIri");
   const loadPkgApi = servicehelper.getApi("editor-fe", "loadPkg");
   const {url, method} = loadPkgApi;
   return axios({
