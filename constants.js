@@ -5,7 +5,7 @@ const API_PORT = process.env.API_PORT || '8080' ;
 
 /** Folders */
 const CONFIG_FOLDER = () => 'configs';
-const AKN_ATT_FOLDER = () => path.join("..", "gawati-client-server", "akn_data");
+const AKN_ATT_FOLDER = () => path.join("..", "gawati-editor-fe", "akn_data");
 const TMP_AKN_FOLDER = () => path.join(".", "tmp");
 
 
