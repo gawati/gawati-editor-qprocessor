@@ -39,7 +39,7 @@ const publishOnStatusQ = (req, res, next) => {
 
     res.locals.returnResponse = {
         'success': {
-            'code': 'publish_status',
+            'code': 'publish_retract_status',
             'message': res.locals.formObject
         }
     }
