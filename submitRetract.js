@@ -14,8 +14,10 @@ const toPortal = ({iri, action}) => {
     url: url,
     data: {data}
   })
-  .then(response => {
-    console.log("Posted IRI to be retracted", response.data);
+  .then(res => {
+    (res.data.success)
+    ? qh.publishStatus(qh.formMsg(iri, 'under_retraction', res.data.success.message))
+    : qh.publishStatus(qh.formMsg(iri, 'failed', res.data.error.message))
   })
   .catch((err) => {
     qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor'));
