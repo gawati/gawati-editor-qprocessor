@@ -217,8 +217,8 @@ const loadPkgForIri = (iri) => {
 }
 
 //Get XML, Public key (if present), Attachments, Zip and post to Portal
-const toPortal = (iri) => {
-  console.log(" IN: toPortal");
+const toPortal = ({iri}) => {
+  console.log(" IN: toPortal (Publish)");
   loadPkgForIri(iri)
   .then(response => {
     const contentType = response.headers['content-type'];

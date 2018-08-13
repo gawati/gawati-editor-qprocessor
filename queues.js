@@ -1,5 +1,6 @@
 const amqp = require('amqplib/callback_api');
-const submit = require('./submitPublish');
+const submitPublish = require('./submitPublish');
+const submitRetract = require('./submitRetract');
 
 /**
  * Important: mqConfig channels get set in the async calls.
@@ -62,7 +63,9 @@ function publisherStatusQ(conn) {
 function dispatch(qObj) {
   const {action} = qObj;
   if (action === 'publish') {
-    submit.toPortal(qObj.iri);
+    submitPublish.toPortal(qObj);
+  } else if (action === 'retract') {
+    submitRetract.toPortal(qObj);
   }
 }
  

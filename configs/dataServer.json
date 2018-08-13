@@ -37,6 +37,10 @@
             "pubPkg": {
                 "url": "/gwpq/publish/pkg",
                 "method": "post"
+            },
+            "retractPkg": {
+                "url": "/gwpq/retract/pkg",
+                "method": "post"
             }
         }
     }
