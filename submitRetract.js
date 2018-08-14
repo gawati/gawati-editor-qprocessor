@@ -2,6 +2,8 @@ const axios = require("axios");
 const servicehelper = require("./utils/ServiceHelper");
 const qh = require("./utils/QueueHelper");
 
+const ACTION = 'retract';
+
 //Post Iri to be retracted to Portal
 const toPortal = ({iri, action}) => {
   console.log(" IN: toPortal (Retract)");
@@ -16,11 +18,11 @@ const toPortal = ({iri, action}) => {
   })
   .then(res => {
     (res.data.success)
-    ? qh.publishStatus(qh.formMsg(iri, 'under_retraction', res.data.success.message))
-    : qh.publishStatus(qh.formMsg(iri, 'failed', res.data.error.message))
+    ? qh.publishStatus(qh.formMsg(iri, 'under_retraction', res.data.success.message, ACTION))
+    : qh.publishStatus(qh.formMsg(iri, 'failed', res.data.error.message, ACTION))
   })
   .catch((err) => {
-    qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor'));
+    qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor', ACTION));
     console.log(err);
   });
 };

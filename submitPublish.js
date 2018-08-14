@@ -13,6 +13,8 @@ const glob = require("glob");
 const constants = require("./constants");
 const extract = require("extract-zip");
 
+const ACTION = 'publish';
+
 /**
  * Extract a zip folder
  */
@@ -67,11 +69,11 @@ const postPkg = (iri, zipPath) => {
   .then(res => postToPortal(iri, zipPath, res))
   .then((res) => {
     (res.data.success)
-    ? qh.publishStatus(qh.formMsg(iri, 'under_processing', res.data.success.message))
-    : qh.publishStatus(qh.formMsg(iri, 'failed', res.data.error.message))
+    ? qh.publishStatus(qh.formMsg(iri, 'under_processing', res.data.success.message, ACTION))
+    : qh.publishStatus(qh.formMsg(iri, 'failed', res.data.error.message, ACTION))
   })
   .catch((err) => {
-    qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Portal Q Processor'))
+    qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Portal Q Processor', ACTION))
     console.log(err)
   });
 }
@@ -195,7 +197,7 @@ async function prepareZip(data, iri) {
         //Pass postPkg as callback on completion of zip.
         .then(res => zipFolder(tmpUid, zipPath, () => postPkg(iri, zipPath)))
         .catch((err) => {
-          qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor'));
+          qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor', ACTION));
           console.log(err);
         });
       }
@@ -217,20 +219,20 @@ const loadPkgForIri = (iri) => {
 }
 
 //Get XML, Public key (if present), Attachments, Zip and post to Portal
-const toPortal = ({iri}) => {
+const toPortal = ({iri, action}) => {
   console.log(" IN: toPortal (Publish)");
   loadPkgForIri(iri)
   .then(response => {
     const contentType = response.headers['content-type'];
     if (contentType.indexOf('application/json') !== -1) {
-        qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor'));
+        qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor', ACTION));
         console.log("Error while loading the IRI package");
     } else {
       prepareZip(response.data, iri);
     }
   })
   .catch((err) => {
-    qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor'));
+    qh.publishStatus(qh.formMsg(iri, 'failed', 'Error on Editor Q Processor', ACTION));
     console.log(err);
   });
 };
