@@ -1,11 +1,12 @@
 /**
  * Construct msg for STATUS_Q
  */
-const formMsg = (iri, status, message) => {
+const formMsg = (iri, status, message, action) => {
   return msg = {
     "iri": iri,
     "status": status,
-    "message": message
+    "message": message,
+    "action": action
   };
 }
 

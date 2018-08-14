@@ -1,5 +1,6 @@
 const amqp = require('amqplib/callback_api');
-const submit = require('./submitPublish');
+const submitPublish = require('./submitPublish');
+const submitRetract = require('./submitRetract');
 
 /**
  * Important: mqConfig channels get set in the async calls.
@@ -57,6 +58,16 @@ function publisherStatusQ(conn) {
     // console.log(" [x] Sent %s: '%s'", key, msg);
   }
 }
+
+// Dispatches the IRI to the function based on action : publish or retract 
+function dispatch(qObj) {
+  const {action} = qObj;
+  if (action === 'publish') {
+    submitPublish.toPortal(qObj);
+  } else if (action === 'retract') {
+    submitRetract.toPortal(qObj);
+  }
+}
  
 // Consumer
 function consumerIriQ(conn) {
@@ -74,7 +85,7 @@ function consumerIriQ(conn) {
       channel.bindQueue(q.queue, ex, key);
       channel.consume(q.queue, function(msg) {
         console.log(" [x] %s: '%s'", msg.fields.routingKey, msg.content.toString());
-        submit.toPortal(msg.content.toString());
+        dispatch(JSON.parse(msg.content.toString()));
       }, {noAck: true});
 
       //For standalone testing only
