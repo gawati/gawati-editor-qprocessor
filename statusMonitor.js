@@ -34,8 +34,8 @@ const returnResponse = (req, res) => {
  */
 const publishOnStatusQ = (req, res, next) => {
     console.log(" IN: publishOnStatusQ");
-    const {iri, status, message} = res.locals.formObject;
-    qh.publishStatus(qh.formMsg(iri, status, message));
+    const {iri, status, message, action} = res.locals.formObject;
+    qh.publishStatus(qh.formMsg(iri, status, message, action));
 
     res.locals.returnResponse = {
         'success': {
